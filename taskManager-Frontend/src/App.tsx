@@ -1,122 +1,79 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect } from "react";
+import {
+  getTasks,
+  createTask,
+  editTask,
+  editTaskStatus,
+  deleteTask,
+} from "./api/tasks";
 
 function App() {
-  const [count, setCount] = useState(0)
+  useEffect(() => {
+    const testAllEndpoints = async () => {
+      console.log("🚀 STARTING RAW SQL ENDPOINT TESTS...");
+
+      try {
+        // 1. TEST GET ALL TASKS
+        console.log("--- Testing GET Tasks ---");
+        const tasks = await getTasks();
+        console.log("✅ GET SUCCESS. Current tasks in DB:", tasks);
+
+        // 2. TEST CREATE TASK
+        console.log("--- Testing POST Create Task ---");
+        const newDoc = await createTask({
+          title: "Test Deadline Task",
+          description: "Testing raw SQL pool connections",
+          status: "pending",
+          created_by: 1, // Ensure this ID exists in your users table if you have a foreign key!
+        });
+        console.log("✅ POST SUCCESS. Created task:", newDoc);
+        const newTaskId = newDoc.task.id; // Grabs the ID of the task we just created
+
+        // 3. TEST EDIT TASK TEXT
+        console.log(`--- Testing PUT Edit Task for ID: ${newTaskId} ---`);
+        const updatedDoc = await editTask(newTaskId, {
+          title: "Updated Title via Frontend Test",
+          description: "This text was modified by App.tsx",
+          status: "pending",
+        });
+        console.log("✅ PUT SUCCESS. Updated row data:", updatedDoc);
+
+        // 4. TEST EDIT TASK STATUS (PATCH)
+        console.log(`--- Testing PATCH Status for ID: ${newTaskId} ---`);
+        const patchedDoc = await editTaskStatus(newTaskId, "completed");
+        console.log("✅ PATCH SUCCESS. New status data:", patchedDoc);
+
+        // 5. TEST DELETE TASK
+        console.log(`--- Testing DELETE for ID: ${newTaskId} ---`);
+        const deleteResult = await deleteTask(newTaskId);
+        console.log("✅ DELETE SUCCESS. Result message:", deleteResult);
+
+        console.log("🎉 ALL 5 RAW SQL ENDPOINTS ARE WORKING PERFECTLY!");
+      } catch (error: any) {
+        console.error("❌ TEST FAILED! Look at the error details below:");
+        if (error.response) {
+          console.error(
+            `Backend returned status ${error.response.status}:`,
+            error.response.data,
+          );
+        } else {
+          console.error("Network/Connection error:", error.message);
+        }
+      }
+    };
+
+    testAllEndpoints();
+  }, []);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div style={{ padding: "40px", fontFamily: "sans-serif" }}>
+      <h1>Running Backend Integration Tests...</h1>
+      <p>
+        Right-click this screen, click <strong>Inspect</strong>, and open the{" "}
+        <strong>Console</strong> tab to watch your raw SQL queries fire!
+      </p>
+    </div>
+  );
 }
 
-export default App
+export default App;

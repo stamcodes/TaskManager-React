@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
@@ -7,6 +8,15 @@ import taskRoutes from "../routes/taskRoutes";
 dotenv.config();
 
 const app = express();
+//Cors Middleware
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 //Swagger initialization docs
@@ -51,7 +61,7 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions);
 // });
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use("/", taskRoutes);
+app.use("/api/tasks", taskRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
