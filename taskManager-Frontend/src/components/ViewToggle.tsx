@@ -34,7 +34,7 @@ export const ViewToggle = ({ currentView, onViewChange }: ViewToggleProps) => {
           Kanban board
         </button>
 
-        {/*zTable Button*/}
+        {/*Table Button*/}
         <button
           onClick={() => onViewChange("table")}
           style={{
