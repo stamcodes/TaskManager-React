@@ -1,13 +1,34 @@
 import express from "express";
 import dotenv from "dotenv";
-import taskRouter from "../controllers/taskController";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import taskRoutes from "../routes/taskRoutes";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-app.use("/", taskRouter);
+//Swagger initialization docs
+const swaggerOptions: swaggerJSDoc.Options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Task Manager API",
+      version: "1.0.0",
+      description: "Task Manager REST API documentation",
+    },
+    servers: [
+      {
+        url: "http://localhost:5000",
+        description: "Development Server",
+      },
+    ],
+  },
+  apis: [__dirname + "/../docs/taskDocs.ts"],
+};
+
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
 // //Test route to see if the dB is being fetched or not.
 // app.get("/api/test-db", async (req, res) => {
@@ -28,6 +49,9 @@ app.use("/", taskRouter);
 //     });
 //   }
 // });
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/", taskRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
