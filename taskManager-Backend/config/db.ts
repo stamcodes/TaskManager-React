@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-//Using the dot env variables
+//Using the dot env
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -25,7 +25,7 @@ async function verifyConnection() {
   }
 }
 
-//Now to verify connection upon module load
+//Now to verify connection upon module loading
 verifyConnection();
 
 export default pool;
