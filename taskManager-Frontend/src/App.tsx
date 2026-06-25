@@ -1,12 +1,25 @@
 import { useState, useEffect } from "react";
 import { ViewToggle } from "./components/ViewToggle";
 import { getTasks, editTaskStatus, type Task } from "./api/tasks";
+import { Card, Select, Row, Col, Typography } from "antd";
+import styled from "styled-components";
+
+//Create a wrapper for Kanban
+
+const KanbanColumnWrapper = styled.div`
+  padding: 10px;
+  min-height: 65vh;
+  background: #f1f5f9;
+`;
 
 function App() {
   const [view, setView] = useState<"kanban" | "table">("table"); // State controlling active layout
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  // Fetch your data from raw SQL backend on page load
+  //Columns variable initialization to match backend
+  const columns = ["pending", "in progress", "blocked", "complete"];
+
+  // Fetch data using raw SQL
   useEffect(() => {
     getTasks()
       .then((data) => {
@@ -115,7 +128,64 @@ function App() {
             )}
           </div>
         ) : (
-          <div>PLACEHOLDER FOR KANBAN STYLE</div>
+          <Row gutter={10}>
+            {columns.map((colName) => (
+              <Col key={colName} span={6}>
+                <KanbanColumnWrapper>
+                  <Typography.Title
+                    level={5}
+                    style={{
+                      textTransform: "capitalize",
+                      marginBottom: "16px",
+                    }}
+                  >
+                    {colName} (
+                    {
+                      tasks.filter((t) => t.status.toLowerCase() === colName)
+                        .length
+                    }
+                    )
+                  </Typography.Title>
+                  {tasks
+                    .filter((task) => task.status.toLowerCase() === colName)
+                    .map((task) => (
+                      <Card
+                        key={task.id}
+                        title={task.title}
+                        style={{ borderRadius: "6px" }}
+                        extra={
+                          <Select
+                            value={task.status.toLowerCase()}
+                            style={{ width: 120 }}
+                            onChange={(val) => handleStatusChange(task.id, val)}
+                            // Refactored from Select.Option to options array parameter to address deprecation issue
+                            options={[
+                              { value: "pending", label: "Pending" },
+                              { value: "in progress", label: "In Progress" },
+                              { value: "blocked", label: "Blocked" },
+                              { value: "complete", label: "Complete" },
+                            ]}
+                          />
+                        }
+                      >
+                        <p
+                          style={{
+                            color: "#64748b",
+                            fontSize: "13px",
+                            margin: "0 0 10px 0",
+                          }}
+                        >
+                          {task.description || "No description provided."}
+                        </p>
+                        <div style={{ fontSize: "11px", color: "#94a3b8" }}>
+                          Created By ID: {task.created_by_id}
+                        </div>
+                      </Card>
+                    ))}
+                </KanbanColumnWrapper>
+              </Col>
+            ))}
+          </Row>
         )}
       </div>
     </div>
