@@ -13,7 +13,7 @@ const pool = new Pool({
 });
 
 //Check for connection is built
-async function verifyConnection(): Promise<void> {
+async function verifyConnection() {
   try {
     //Attempt to acquire a client from the pool
 
