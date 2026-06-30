@@ -1,6 +1,6 @@
 services:
   api:
-    build: ./TaskManager-Backend
+    image: staneerahmed/taskmanager-backend:v1
     ports:
       - "5001:5000"
     environment:
@@ -16,7 +16,7 @@ services:
         condition: service_healthy
 
   web:
-    build: ./TaskManager-Frontend
+    image: staneerahmed/taskmanager-frontend:v1
     ports:
       - "5174:5173"
     environment:
