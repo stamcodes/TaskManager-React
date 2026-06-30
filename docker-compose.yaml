@@ -1,0 +1,42 @@
+services:
+  api:
+    build: ./TaskManager-Backend
+    ports:
+      - "5001:5000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: admin
+      DB_NAME: taskManager
+      CORS_ORIGIN: http://localhost:5174
+      PORT: 5000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./TaskManager-Frontend
+    ports:
+      - "5174:5173"
+    environment:
+      VITE_API_URL: http://localhost:5001
+    depends_on:
+      - api
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: taskManager
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - tm_pgdata:/var/lib/postgresql/data
+
+volumes:
+  tm_pgdata:
