@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/tasks`;
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/tasks/api`;
 
 export interface Task {
   id: number;

@@ -37,6 +37,7 @@ services:
       retries: 5
     volumes:
       - tm_pgdata:/var/lib/postgresql/data
+      - ./taskmanager.sql:/docker-entrypoint-initdb.d/taskmanager.sql
 
 volumes:
   tm_pgdata:
